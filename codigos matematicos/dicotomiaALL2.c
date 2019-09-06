@@ -1,0 +1,85 @@
+//Henrique Rodrigues Silva  RA:190898
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+void aloca_float(float **p, int tam){
+	if((*p=(float*)realloc(*p,tam*sizeof(float))) == NULL) printf("Erro\n");
+}
+
+float calc(float *ind, float *ele, float a, int n){   //acha o valor de y para determinado x, f(x)=y
+	float a_prox=0;
+	int i;
+	
+	for(i=0;i<=n;i++){
+		a_prox += (*(ind+i))*(pow(a,*(ele+i)));
+	}
+		
+	return (roundf(a_prox * 1000)/1000);
+}
+
+void calcula(float *ind, float *ele, int n){
+	float a, b, a_prox, b_prox, erro, m,m_prox=1;
+	int i;
+	
+	printf("Digite o erro da equacao\n");
+	scanf(" %f",&erro);
+	
+	printf("Digite o intervalo da equacao\n");
+	scanf(" %f %f",&a,&b);
+	
+	i=0;
+	while((m_prox > erro) || (-m_prox > erro)){	   //criterio de parada escolhido: |f(m)| < erro
+		m=(a+b)/2;
+		m= roundf(m*1000)/1000; //arredonda 3 casas decimais depois da virgula (float)
+		
+		a_prox = calc(ind,ele,a,n);
+		b_prox = calc(ind,ele,b,n);
+		m_prox = calc(ind,ele,m,n);
+		printf("%d   a = %.3f  m = %.3f  b = %.3f     f(a) = %.3f  f(m) = %.3f  f(b) = %.3f\n",i,a,m,b,a_prox,m_prox,b_prox);
+		
+		//roundf(val * 1000) / 1000   para arredondar um float na 3 casa decimal
+		
+		if((a_prox < 0 && m_prox > 0) || (a_prox > 0 && m_prox < 0) ){
+			a = a;
+			b = m;
+		}
+		else if((m_prox < 0 && b_prox > 0)|| (m_prox > 0 && b_prox < 0) ){
+			a=m;
+			b=b;
+		}
+		i++;
+	}
+	printf("O valor de k = %d",i-1);	
+}
+
+void recebe(float *ind, float *ele){ //recebe a quantidade a ser alocada, e recebe os parametros da equação
+	int n,i,aux;
+	
+	printf("Digite o grau da equacao\n");
+	scanf(" %d",&n);
+	
+	ind=NULL;
+	ele=NULL;
+	aloca_float(&(ind),n+1);
+	aloca_float(&(ele),n+1);
+	
+	aux=n;
+	for(i=0;i<=n;i++){
+		printf("Digite o indice %d\n",aux);
+		scanf(" %f", (ind+i));
+		*(ele+i) = aux;
+		aux--;
+	}
+	calcula(ind,ele,n);
+}
+
+int main(){
+	int i,n,aux;
+	float *ind,*ele;
+	
+	recebe(ind,ele);
+	
+	return 0;
+}
